@@ -15,10 +15,7 @@ namespace TemperUSB.Utility
         public double Calibration_Offset = 0;
         public double Calibration_Scale = 1;
 
-        byte[] ini = { 0x01, 0x01 };
-        byte[] temp = { 0x01, 0x80, 0x33, 0x01, 0x00, 0x00, 0x00, 0x00 };
-        byte[] ini1 = { 0x01, 0x82, 0x77, 0x01, 0x00, 0x00, 0x00, 0x00 };
-        byte[] ini2 = { 0x01, 0x86, 0xff, 0x01, 0x00, 0x00, 0x00, 0x00 };
+        byte[] _tempData = { 0x01, 0x80, 0x33, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
         private void ReadBogus(HidReport report)
         {
@@ -32,7 +29,7 @@ namespace TemperUSB.Utility
             {
                 var outData = Bulk.CreateReport();
                 outData.ReportId = 0x00;
-                outData.Data = temp;
+                outData.Data = _tempData;
                 Bulk.WriteReport(outData);
                 while (outData.ReadStatus == HidDeviceData.ReadStatus.NoDataRead) ;
                 
@@ -51,38 +48,63 @@ namespace TemperUSB.Utility
             Bulk.OpenDevice();
             IsInitialised = false;
 
-            var outData1 = Control.CreateReport();
-            outData1.ReportId = 0x01;
-            outData1.Data = ini;
-            Control.WriteReport(outData1);
-            while (outData1.ReadStatus != HidDeviceData.ReadStatus.Success) ;
-            Control.ReadReport(ReadBogus);
+            ClearData();
 
-            var outData3 = Bulk.CreateReport();
-            outData3.ReportId = 0x00;
-            outData3.Data = ini1;
-            Bulk.WriteReport(outData3);
-            while (outData3.ReadStatus != HidDeviceData.ReadStatus.Success) ;
-            Bulk.ReadReport(ReadBogus);
+            InitStep1();
+            InitStep2();
+            InitStep3();
 
+            ClearData();
+
+            IsInitialised = true;
+        }
+
+        private void InitStep3()
+        {
+            byte[] data = { 0x01, 0x86, 0xff, 0x01, 0x00, 0x00, 0x00, 0x00 };
             var outData4 = Bulk.CreateReport();
             outData4.ReportId = 0x00;
-            outData4.Data = ini2;
+            outData4.Data = data;
             Bulk.WriteReport(outData4);
             while (outData4.ReadStatus != HidDeviceData.ReadStatus.Success) ;
             Bulk.ReadReport(ReadBogus);
-            
-            var outData2 = Bulk.CreateReport();
-            outData2.ReportId = 0x00;
-            outData2.Data = temp;
-            Bulk.WriteReport(outData2);
-            while (outData2.ReadStatus != HidDeviceData.ReadStatus.Success) ;
-            Bulk.ReadReport(ReadBogus);
-            Bulk.WriteReport(outData2);
-            while (outData2.ReadStatus != HidDeviceData.ReadStatus.Success) ;
-            Bulk.ReadReport(ReadBogus);
+        }
 
-            IsInitialised = true;
+        private void InitStep2()
+        {
+            byte[] data = { 0x01, 0x82, 0x77, 0x01, 0x00, 0x00, 0x00, 0x00 };
+
+            var outData3 = Bulk.CreateReport();
+            outData3.ReportId = 0x00;
+            outData3.Data = data;
+            Bulk.WriteReport(outData3);
+            while (outData3.ReadStatus != HidDeviceData.ReadStatus.Success) ;
+            Bulk.ReadReport(ReadBogus);
+        }
+
+        private void InitStep1()
+        {
+            byte[] data = { 0x01, 0x01 };
+
+            var outData1 = Control.CreateReport();
+            outData1.ReportId = 0x01;
+            outData1.Data = data;
+            Control.WriteReport(outData1);
+            while (outData1.ReadStatus != HidDeviceData.ReadStatus.Success) ;
+            Control.ReadReport(ReadBogus);
+        }
+
+        private void ClearData()
+        {
+            var tmp = Bulk.CreateReport();
+            tmp.ReportId = 0x00;
+            tmp.Data = _tempData;
+            Bulk.WriteReport(tmp);
+            while (tmp.ReadStatus != HidDeviceData.ReadStatus.Success) ;
+            Bulk.ReadReport(ReadBogus);
+            Bulk.WriteReport(tmp);
+            while (tmp.ReadStatus != HidDeviceData.ReadStatus.Success) ;
+            Bulk.ReadReport(ReadBogus);
         }
 
         public void Close()
