@@ -31,6 +31,7 @@ namespace TemperUSB.Utility
                 outData.ReportId = 0x00;
                 outData.Data = _tempData;
                 Bulk.WriteReport(outData);
+                System.Threading.Thread.Sleep(250);
                 while (outData.ReadStatus == HidDeviceData.ReadStatus.NoDataRead) ;
                 
                 var report = Bulk.ReadReport();
@@ -65,7 +66,7 @@ namespace TemperUSB.Utility
             var outData4 = Bulk.CreateReport();
             outData4.ReportId = 0x00;
             outData4.Data = data;
-            Bulk.WriteReport(outData4);
+            Bulk.WriteReport(outData4);            
             while (outData4.ReadStatus != HidDeviceData.ReadStatus.Success) ;
             Bulk.ReadReport(ReadBogus);
         }
@@ -77,7 +78,7 @@ namespace TemperUSB.Utility
             var outData3 = Bulk.CreateReport();
             outData3.ReportId = 0x00;
             outData3.Data = data;
-            Bulk.WriteReport(outData3);
+            Bulk.WriteReport(outData3);            
             while (outData3.ReadStatus != HidDeviceData.ReadStatus.Success) ;
             Bulk.ReadReport(ReadBogus);
         }
@@ -89,7 +90,7 @@ namespace TemperUSB.Utility
             var outData1 = Control.CreateReport();
             outData1.ReportId = 0x01;
             outData1.Data = data;
-            Control.WriteReport(outData1);
+            Control.WriteReport(outData1);            
             while (outData1.ReadStatus != HidDeviceData.ReadStatus.Success) ;
             Control.ReadReport(ReadBogus);
         }
@@ -99,10 +100,10 @@ namespace TemperUSB.Utility
             var tmp = Bulk.CreateReport();
             tmp.ReportId = 0x00;
             tmp.Data = _tempData;
-            Bulk.WriteReport(tmp);
+            Bulk.WriteReport(tmp);            
             while (tmp.ReadStatus != HidDeviceData.ReadStatus.Success) ;
             Bulk.ReadReport(ReadBogus);
-            Bulk.WriteReport(tmp);
+            Bulk.WriteReport(tmp);            
             while (tmp.ReadStatus != HidDeviceData.ReadStatus.Success) ;
             Bulk.ReadReport(ReadBogus);
         }

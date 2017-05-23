@@ -21,10 +21,11 @@ namespace TemperUSB.ConsoleTest
                     {
                         d.Open();
                         deviceCounter++;
-                        Console.WriteLine("Device {0} : {1}", deviceCounter, d.GetTemperature());
+                        for (int j = 0; j < 10; j++)
+                            Console.WriteLine("Device {0} : {1}", deviceCounter, d.GetTemperature());
                         d.Close();
                     }
-                    System.Threading.Thread.Sleep(10);
+                    System.Threading.Thread.Sleep(100);
                 }
             }
                 
